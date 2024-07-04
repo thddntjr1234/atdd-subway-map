@@ -3,6 +3,7 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,23 +31,14 @@ public class StationAcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
 
-        ExtractableResponse<Response> response =
-                RestAssured.given().log().all()
-                        .body(params)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .when().post("/stations")
-                        .then().log().all()
-                        .extract();
+        ExtractableResponse<Response> response = StationCommonApi.createStation(params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = StationCommonApi.findAllStations()
+            .jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -55,13 +47,44 @@ public class StationAcceptanceTest {
      * When 지하철역 목록을 조회하면
      * Then 2개의 지하철역을 응답 받는다
      */
-    // TODO: 지하철역 목록 조회 인수 테스트 메서드 생성
+    @DisplayName("지하철역 목록을 조회한다.")
+    @Test
+    void findStationNames() {
+        //given
+        List<Map<String, String>> stations = new ArrayList<>();
+        stations.add(Map.of("name", "부평구청역"));
+        stations.add(Map.of("name", "가산디지털단지역"));
+
+        stations.forEach(StationCommonApi::createStation);
+
+        // when
+        List<String> stationNames = StationCommonApi.findAllStations()
+            .jsonPath().getList("name", String.class);
+
+        //then
+        assertThat(stationNames).contains("부평구청역", "가산디지털단지역");
+    }
 
     /**
      * Given 지하철역을 생성하고
      * When 그 지하철역을 삭제하면
      * Then 그 지하철역 목록 조회 시 생성한 역을 찾을 수 없다
      */
-    // TODO: 지하철역 제거 인수 테스트 메서드 생성
+    @DisplayName("지하철역을 제거한다.")
+    @Test
+    void deleteStation() {
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "강남역");
 
+        StationCommonApi.createStation(params);
+
+        //when
+        StationCommonApi.deleteStation(1L);
+
+        //then
+        List<String> stationNames = StationCommonApi.findAllStations().jsonPath()
+            .getList("name", String.class);
+        assertThat(stationNames).doesNotContain("강남역");
+    }
 }
