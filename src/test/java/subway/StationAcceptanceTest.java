@@ -28,10 +28,7 @@ public class StationAcceptanceTest {
     @Test
     void createStation() {
         // when
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        ExtractableResponse<Response> response = StationCommonApi.createStation(params);
+        var response = StationCommonApi.createStation("강남역");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -51,18 +48,15 @@ public class StationAcceptanceTest {
     @Test
     void findStationNames() {
         //given
-        List<Map<String, String>> stations = new ArrayList<>();
-        stations.add(Map.of("name", "부평구청역"));
-        stations.add(Map.of("name", "가산디지털단지역"));
-
-        stations.forEach(StationCommonApi::createStation);
+        StationCommonApi.createStation("부평구청역");
+        StationCommonApi.createStation("가산디지털단지역");
 
         // when
         List<String> stationNames = StationCommonApi.findAllStations()
             .jsonPath().getList("name", String.class);
 
         //then
-        assertThat(stationNames).contains("부평구청역", "가산디지털단지역");
+        assertThat(stationNames).containsExactly("부평구청역", "가산디지털단지역");
     }
 
     /**
@@ -74,10 +68,7 @@ public class StationAcceptanceTest {
     @Test
     void deleteStation() {
         //given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-
-        StationCommonApi.createStation(params);
+        StationCommonApi.createStation("강남역");
 
         //when
         StationCommonApi.deleteStation(1L);
