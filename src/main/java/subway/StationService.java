@@ -32,6 +32,10 @@ public class StationService {
         stationRepository.deleteById(id);
     }
 
+    public Station findByStationId(Long stationId) {
+        return stationRepository.findById(stationId).orElse(null);
+    }
+
     private StationResponse createStationResponse(Station station) {
         return new StationResponse(
                 station.getId(),
