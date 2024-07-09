@@ -54,4 +54,8 @@ public class Line {
     public int getDistance() {
         return distance;
     }
+
+    public LineResponse toResponse() {
+        return new LineResponse(this);
+    }
 }
