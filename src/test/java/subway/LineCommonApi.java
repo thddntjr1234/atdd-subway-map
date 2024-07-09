@@ -13,4 +13,11 @@ public class LineCommonApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> findLines() {
+        return RestAssured.given().log().all()
+                .when().get("/lines")
+                .then().log().all()
+                .extract();
+    }
 }

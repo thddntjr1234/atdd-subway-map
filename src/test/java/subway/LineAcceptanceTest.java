@@ -49,4 +49,27 @@ public class LineAcceptanceTest {
         assertThat(lineResponse.getId()).isEqualTo(1L);
         assertThat(lineResponse.getStations()).contains(new StationResponse(1L, "장암역"), new StationResponse(2L, "석남역"));
     }
+
+
+    /**
+     * Given: 여러 개의 지하철 노선이 등록되어 있고,
+     * When: 관리자가 지하철 노선 목록을 조회하면,
+     * Then: 모든 지하철 노선 목록이 반환된다.
+     */
+    @DisplayName("지하철 노선 목록을 조회한다.")
+    @Test
+    void findLines() {
+        //given
+        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
+        LineCommonApi.createLine(request);
+        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
+        LineCommonApi.createLine(request);
+
+        //when
+        List<LineResponse> lines = LineCommonApi.findLines().jsonPath().getList(".", LineResponse.class);
+        List<String> names = lines.stream().map(LineResponse::getName).collect(Collectors.toList());
+
+        //then
+        assertThat(names).containsExactly("7호선", "인천1호선");
+    }
 }
