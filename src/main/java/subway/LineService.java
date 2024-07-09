@@ -22,16 +22,12 @@ public class LineService {
 
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upwardStation, downwardStation, lineRequest.getDistance()));
 
-        return createLineResponse(line);
+        return line.toResponse();
     }
 
     public List<LineResponse> findLines() {
         return lineRepository.findAll().stream()
                 .map(Line::toResponse)
                 .collect(Collectors.toList());
-    }
-
-    private LineResponse createLineResponse(Line line) {
-        return new LineResponse(line);
     }
 }
