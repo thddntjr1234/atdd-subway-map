@@ -50,7 +50,6 @@ public class LineAcceptanceTest {
         assertThat(lineResponse.getStations()).contains(new StationResponse(1L, "장암역"), new StationResponse(2L, "석남역"));
     }
 
-
     /**
      * Given: 여러 개의 지하철 노선이 등록되어 있고,
      * When: 관리자가 지하철 노선 목록을 조회하면,
@@ -71,5 +70,29 @@ public class LineAcceptanceTest {
 
         //then
         assertThat(names).containsExactly("7호선", "인천1호선");
+    }
+
+    /**
+     * Given: 특정 지하철 노선이 등록되어 있고,
+     * When: 관리자가 해당 노선을 조회하면,
+     * Then: 해당 노선의 정보가 반환된다.
+     */
+    @DisplayName("지하철 노선을 조회한다")
+    @Test
+    void findLine() {
+        //given
+        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
+        LineCommonApi.createLine(request);
+        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
+        LineCommonApi.createLine(request);
+
+        //when
+        var response = LineCommonApi.findLineById(1L);
+        LineResponse line = response.as(LineResponse.class);
+
+        //then
+        assertThat(line.getId()).isEqualTo(1L);
+        assertThat(line.getName()).isEqualTo("7호선");
+        assertThat(line.getStations()).containsExactly(new StationResponse(1L, "장암역"), new StationResponse(2L, "석남역"));
     }
 }

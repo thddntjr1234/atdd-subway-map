@@ -20,4 +20,12 @@ public class LineCommonApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> findLineById(Long id) {
+        return RestAssured.given().log().all()
+                .queryParam("id", id)
+                .when().get("/line")
+                .then().log().all()
+                .extract();
+    }
 }
