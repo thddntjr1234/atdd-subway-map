@@ -30,4 +30,10 @@ public class LineService {
                 .map(Line::toResponse)
                 .collect(Collectors.toList());
     }
+
+    public LineResponse findLineById(Long id) {
+        return lineRepository.findById(id).orElseThrow(() -> {
+            throw new RuntimeException("조회할 노선이 존재하지 않습니다.");
+        }).toResponse();
+    }
 }
