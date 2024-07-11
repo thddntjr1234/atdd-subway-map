@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@Sql(scripts = "/line-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class LineAcceptanceTest {
 
     /**
