@@ -36,4 +36,12 @@ public class LineCommonApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteLine(Long id) {
+        return RestAssured.given().log().all()
+                .param("id", id)
+                .when().delete("/line")
+                .then().log().all()
+                .extract();
+    }
 }

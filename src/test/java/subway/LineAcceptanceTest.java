@@ -122,4 +122,24 @@ public class LineAcceptanceTest {
         LineResponse afterLine = LineCommonApi.findLineById(1L).as(LineResponse.class);
         assertThat(beforeLine).isNotEqualTo(afterLine);
     }
+
+    @DisplayName("지하철 노선을 삭제한다")
+    @Test
+    void deleteLine() {
+        //given
+        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
+        LineCommonApi.createLine(request);
+        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
+        LineCommonApi.createLine(request);
+
+        //when
+        LineCommonApi.deleteLine(1L);
+
+        //then
+        var lines = LineCommonApi.findLines()
+                .jsonPath()
+                .getList("name", String.class);
+
+        assertThat(lines).doesNotContain("7호선");
+    }
 }
