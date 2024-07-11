@@ -37,4 +37,10 @@ public class LineController {
         lineService.modifyLine(lineRequest);
         return ResponseEntity.ok(null);
     }
+
+    @DeleteMapping("/line")
+    public ResponseEntity<LineResponse> deleteLine(@ModelAttribute LineRequest lineRequest) {
+        lineService.deleteLine(lineRequest);
+        return ResponseEntity.ok(null);
+    }
 }

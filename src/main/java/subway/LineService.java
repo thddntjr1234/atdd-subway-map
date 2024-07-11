@@ -50,4 +50,9 @@ public class LineService {
         line.update(lineRequest.getId(), lineRequest.getName(), lineRequest.getColor(), upwardStation, downwardStation, lineRequest.getDistance());
         lineRepository.save(line);
     }
+
+    @Transactional
+    public void deleteLine(LineRequest lineRequest) {
+        lineRepository.deleteById(lineRequest.getId());
+    }
 }
