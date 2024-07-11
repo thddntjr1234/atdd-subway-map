@@ -23,7 +23,25 @@ public class Line {
     public Line() {
     }
 
+    public Line(Long id, String name, String color, Station upwardStation, Station downwardStation, int distance) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.upwardStation = upwardStation;
+        this.downwardStation = downwardStation;
+        this.distance = distance;
+    }
+
     public Line(String name, String color, Station upwardStation, Station downwardStation, int distance) {
+        this.name = name;
+        this.color = color;
+        this.upwardStation = upwardStation;
+        this.downwardStation = downwardStation;
+        this.distance = distance;
+    }
+
+    public void update(Long id, String name, String color, Station upwardStation, Station downwardStation, int distance) {
+        this.id = id;
         this.name = name;
         this.color = color;
         this.upwardStation = upwardStation;
