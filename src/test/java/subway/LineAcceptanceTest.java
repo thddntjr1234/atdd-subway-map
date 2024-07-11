@@ -29,6 +29,16 @@ public class LineAcceptanceTest {
     }
 
     /**
+     * 노선 생성 공통 메서드
+     */
+    private void initLines() {
+        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
+        LineCommonApi.createLine(request);
+        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
+        LineCommonApi.createLine(request);
+    }
+
+    /**
      * Given: 새로운 지하철 노선 정보를 입력하고,
      * When: 관리자가 노선을 생성하면,
      * Then: 해당 노선이 생성되고 노선 목록에 포함된다.
@@ -61,10 +71,7 @@ public class LineAcceptanceTest {
     @Test
     void findLines() {
         //given
-        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
-        LineCommonApi.createLine(request);
-        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
-        LineCommonApi.createLine(request);
+        initLines();
 
         //when
         List<LineResponse> lines = LineCommonApi.findLines().jsonPath().getList(".", LineResponse.class);
@@ -83,10 +90,7 @@ public class LineAcceptanceTest {
     @Test
     void findLine() {
         //given
-        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
-        LineCommonApi.createLine(request);
-        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
-        LineCommonApi.createLine(request);
+        initLines();
 
         //when
         var response = LineCommonApi.findLineById(1L);
@@ -107,16 +111,13 @@ public class LineAcceptanceTest {
     @Test
     void modifyLine() {
         //given
-        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
-        LineCommonApi.createLine(request);
-        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
-        LineCommonApi.createLine(request);
+        initLines();
 
         var response = LineCommonApi.findLineById(1L);
         LineResponse beforeLine = response.as(LineResponse.class);
 
         //when
-        request = new LineRequest(beforeLine.getId(), "신 7호선", "bg-red-300", beforeLine.getStations().get(1).getId(), beforeLine.getStations().get(0).getId(), 5);
+        var request = new LineRequest(beforeLine.getId(), "신 7호선", "bg-red-300", beforeLine.getStations().get(1).getId(), beforeLine.getStations().get(0).getId(), 5);
         LineCommonApi.modifyLine(request);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
@@ -129,10 +130,7 @@ public class LineAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
-        LineCommonApi.createLine(request);
-        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
-        LineCommonApi.createLine(request);
+        initLines();
 
         //when
         LineCommonApi.deleteLine(1L);
