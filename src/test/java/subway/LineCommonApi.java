@@ -28,4 +28,12 @@ public class LineCommonApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> modifyLine(LineRequest request) {
+        return RestAssured.given().log().all()
+                .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().put("/line")
+                .then().log().all()
+                .extract();
+    }
 }
