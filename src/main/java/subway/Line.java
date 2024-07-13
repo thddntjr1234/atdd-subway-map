@@ -40,13 +40,9 @@ public class Line {
         this.distance = distance;
     }
 
-    public void update(Long id, String name, String color, Station upwardStation, Station downwardStation, int distance) {
-        this.id = id;
+    public void update(String name, String color) {
         this.name = name;
         this.color = color;
-        this.upwardStation = upwardStation;
-        this.downwardStation = downwardStation;
-        this.distance = distance;
     }
 
     public Long getId() {
@@ -71,9 +67,5 @@ public class Line {
 
     public int getDistance() {
         return distance;
-    }
-
-    public LineResponse toResponse() {
-        return new LineResponse(this);
     }
 }

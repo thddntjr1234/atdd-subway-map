@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,22 +18,29 @@ import static org.assertj.core.api.Assertions.*;
 @Sql(scripts = "/line-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class LineAcceptanceTest {
 
+    private StationResponse 장암역;
+    private StationResponse 석남역;
+    private StationResponse 계양역;
+    private StationResponse 송도달빛축제공원역;
+
     /**
      * 초기 지하철 역 생성
      */
     @BeforeEach
     void initStations() {
-        Arrays.asList("장암역", "석남역", "계양역", "송도달빛축제공원역")
-                .forEach(StationCommonApi::createStation);
+        장암역 = StationCommonApi.createStation("장암역").as(StationResponse.class);
+        석남역 = StationCommonApi.createStation("석남역").as(StationResponse.class);
+        계양역 = StationCommonApi.createStation("계양역").as(StationResponse.class);
+        송도달빛축제공원역 = StationCommonApi.createStation("송도달빛축제공원역").as(StationResponse.class);
     }
 
     /**
      * 노선 생성 공통 메서드
      */
     private void initLines() {
-        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
+        LineCreateRequest request = new LineCreateRequest("7호선", "bg-red-600", 장암역.getId(), 석남역.getId(), 10);
         LineCommonApi.createLine(request);
-        request = new LineRequest("인천1호선", "bg-blue-600", 3L, 4L, 12);
+        request = new LineCreateRequest("인천1호선", "bg-blue-600", 계양역.getId(), 송도달빛축제공원역.getId(), 12);
         LineCommonApi.createLine(request);
     }
 
@@ -47,7 +53,7 @@ public class LineAcceptanceTest {
     @Test
     void createLine() {
         //given
-        LineRequest request = new LineRequest("7호선", "bg-red-600", 1L, 2L, 10);
+        LineCreateRequest request = new LineCreateRequest("7호선", "bg-red-600", 장암역.getId(), 석남역.getId(), 10);
 
         var response = LineCommonApi.createLine(request);
 
@@ -58,8 +64,8 @@ public class LineAcceptanceTest {
         LineResponse lineResponse = response.as(LineResponse.class);
 
         // stations 필드로 인해 내부 필드 일부를 검증
-        assertThat(lineResponse.getId()).isEqualTo(1L);
-        assertThat(lineResponse.getStations()).contains(new StationResponse(1L, "장암역"), new StationResponse(2L, "석남역"));
+        assertThat(lineResponse.getId()).isEqualTo(장암역.getId());
+        assertThat(lineResponse.getStations()).contains(new StationResponse(장암역.getId(), "장암역"), new StationResponse(석남역.getId(), "석남역"));
     }
 
     /**
@@ -93,13 +99,13 @@ public class LineAcceptanceTest {
         initLines();
 
         //when
-        var response = LineCommonApi.findLineById(1L);
+        var response = LineCommonApi.findLineById(장암역.getId());
         LineResponse line = response.as(LineResponse.class);
 
         //then
-        assertThat(line.getId()).isEqualTo(1L);
+        assertThat(line.getId()).isEqualTo(장암역.getId());
         assertThat(line.getName()).isEqualTo("7호선");
-        assertThat(line.getStations()).containsExactly(new StationResponse(1L, "장암역"), new StationResponse(2L, "석남역"));
+        assertThat(line.getStations()).containsExactly(new StationResponse(장암역.getId(), "장암역"), new StationResponse(석남역.getId(), "석남역"));
     }
 
     /**
@@ -109,20 +115,19 @@ public class LineAcceptanceTest {
      */
     @DisplayName("지하철 노선을 수정한다")
     @Test
-    void modifyLine() {
+    void updateLine() {
         //given
         initLines();
 
-        var response = LineCommonApi.findLineById(1L);
+        var response = LineCommonApi.findLineById(장암역.getId());
         LineResponse beforeLine = response.as(LineResponse.class);
 
         //when
-        var request = new LineRequest(beforeLine.getId(), "신 7호선", "bg-red-300", beforeLine.getStations().get(1).getId(), beforeLine.getStations().get(0).getId(), 5);
-        LineCommonApi.modifyLine(request);
+        LineCommonApi.updateLine(beforeLine.getId(), new LineUpdateRequest("신 7호선", "bg-blue-600"));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         //then
-        LineResponse afterLine = LineCommonApi.findLineById(1L).as(LineResponse.class);
+        LineResponse afterLine = LineCommonApi.findLineById(장암역.getId()).as(LineResponse.class);
         assertThat(beforeLine).isNotEqualTo(afterLine);
     }
 
@@ -133,7 +138,7 @@ public class LineAcceptanceTest {
         initLines();
 
         //when
-        LineCommonApi.deleteLine(1L);
+        LineCommonApi.deleteLine(장암역.getId());
 
         //then
         var lines = LineCommonApi.findLines()

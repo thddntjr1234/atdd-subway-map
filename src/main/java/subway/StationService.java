@@ -33,7 +33,7 @@ public class StationService {
     }
 
     public Station findByStationId(Long stationId) {
-        return stationRepository.findById(stationId).orElse(null);
+        return stationRepository.findById(stationId).orElseThrow(() -> new IllegalArgumentException("조회할 역이 존재하지 않습니다."));
     }
 
     private StationResponse createStationResponse(Station station) {

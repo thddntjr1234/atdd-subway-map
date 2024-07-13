@@ -15,8 +15,8 @@ public class LineController {
     }
 
     @PostMapping("/lines")
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest request) {
+        LineResponse line = lineService.saveLine(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -26,21 +26,21 @@ public class LineController {
         return ResponseEntity.ok(lines);
     }
 
-    @GetMapping("/line")
-    public ResponseEntity<LineResponse> findLineById(@ModelAttribute LineRequest lineRequest) {
-        LineResponse line = lineService.findLineById(lineRequest.getId());
+    @GetMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+        LineResponse line = lineService.findLineById(id);
         return ResponseEntity.ok(line);
     }
 
-    @PutMapping("/line")
-    public ResponseEntity<LineResponse> updateLine(@RequestBody LineRequest lineRequest) {
-        lineService.modifyLine(lineRequest);
+    @PutMapping("/lines/{id}")
+    public ResponseEntity<LineResponse> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineRequest) {
+        lineService.updateLine(id, lineRequest);
         return ResponseEntity.ok(null);
     }
 
-    @DeleteMapping("/line")
-    public ResponseEntity<LineResponse> deleteLine(@ModelAttribute LineRequest lineRequest) {
-        lineService.deleteLine(lineRequest);
-        return ResponseEntity.ok(null);
+    @DeleteMapping("/lines/{id}")
+    public ResponseEntity<?> deleteLine(@PathVariable Long id) {
+        lineService.deleteLine(id);
+        return ResponseEntity.noContent().build();
     }
 }

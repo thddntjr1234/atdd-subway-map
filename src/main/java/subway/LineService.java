@@ -18,41 +18,40 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest lineRequest) {
-        Station upwardStation = stationService.findByStationId(lineRequest.getUpwardStationId());
-        Station downwardStation = stationService.findByStationId(lineRequest.getDownwardStationId());
+    public LineResponse saveLine(LineCreateRequest request) {
+        Station upwardStation = stationService.findByStationId(request.getUpwardStationId());
+        Station downwardStation = stationService.findByStationId(request.getDownwardStationId());
 
-        Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor(), upwardStation, downwardStation, lineRequest.getDistance()));
+        Line line = lineRepository.save(new Line(request.getName(), request.getColor(), upwardStation, downwardStation, request.getDistance()));
 
-        return line.toResponse();
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> findLines() {
         return lineRepository.findAll().stream()
-                .map(Line::toResponse)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLineById(Long id) {
-        return lineRepository.findById(id).orElseThrow(() -> {
-            throw new RuntimeException("조회할 노선이 존재하지 않습니다.");
-        }).toResponse();
+         Line line = lineRepository.findById(id).orElseThrow(() -> {
+            throw new IllegalArgumentException("조회할 노선이 존재하지 않습니다.");
+         });
+
+         return LineResponse.of(line);
     }
 
     @Transactional
-    public void modifyLine(LineRequest lineRequest) {
-        Line line = lineRepository.findById(lineRequest.getId())
-                .orElseThrow(() -> new RuntimeException("수정할 노선이 존재하지 않습니다."));
+    public void updateLine(Long id, LineUpdateRequest request) {
+        Line line = lineRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("수정할 노선이 존재하지 않습니다."));
 
-        Station upwardStation = stationService.findByStationId(lineRequest.getUpwardStationId());
-        Station downwardStation = stationService.findByStationId(lineRequest.getDownwardStationId());
-
-        line.update(lineRequest.getId(), lineRequest.getName(), lineRequest.getColor(), upwardStation, downwardStation, lineRequest.getDistance());
+        line.update(request.getName(), request.getColor());
         lineRepository.save(line);
     }
 
     @Transactional
-    public void deleteLine(LineRequest lineRequest) {
-        lineRepository.deleteById(lineRequest.getId());
+    public void deleteLine(Long id) {
+        lineRepository.deleteById(id);
     }
 }

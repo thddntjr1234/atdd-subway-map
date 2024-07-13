@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
 public class LineCommonApi {
-    public static ExtractableResponse<Response> createLine(LineRequest request) {
+    public static ExtractableResponse<Response> createLine(LineCreateRequest request) {
         return RestAssured.given().log().all()
                 .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines")
@@ -23,24 +23,22 @@ public class LineCommonApi {
 
     public static ExtractableResponse<Response> findLineById(Long id) {
         return RestAssured.given().log().all()
-                .queryParam("id", id)
-                .when().get("/line")
+                .when().get("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
 
-    public static ExtractableResponse<Response> modifyLine(LineRequest request) {
+    public static ExtractableResponse<Response> updateLine(Long id, LineUpdateRequest request) {
         return RestAssured.given().log().all()
                 .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put("/line")
+                .when().put("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
 
     public static ExtractableResponse<Response> deleteLine(Long id) {
         return RestAssured.given().log().all()
-                .param("id", id)
-                .when().delete("/line")
+                .when().delete("/lines/" + id)
                 .then().log().all()
                 .extract();
     }
