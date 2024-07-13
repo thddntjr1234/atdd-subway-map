@@ -3,13 +3,17 @@ package subway;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
+import subway.StationRequest;
 
 public class StationCommonApi {
 
-  public static ExtractableResponse<Response> createStation(Map<String, String> params) {
+  public static ExtractableResponse<Response> createStation(String stationName) {
+    StationRequest params = new StationRequest(stationName);
+
     return RestAssured.given().log().all()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
