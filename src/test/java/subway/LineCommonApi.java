@@ -42,4 +42,12 @@ public class LineCommonApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> addSection(Long lineId, SectionCreateRequest request) {
+        return RestAssured.given().log().all()
+                .body(request).contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
 }
