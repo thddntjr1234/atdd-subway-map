@@ -1,10 +1,7 @@
 package subway;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,6 +54,29 @@ public class Line {
                 .collect(Collectors.toList());
 
         return !stations.contains(downStation);
+    }
+
+    public void deleteSection(Long stationId) {
+        if (sections.size() == 1) {
+            throw new NoSuchElementException("구간이 1개인 경우 구간을 삭제할 수 없습니다.");
+        }
+
+        Section section = sections.stream()
+                        .filter(element -> Objects.equals(element.getDownwardStation().getId(), stationId))
+                                .findFirst()
+                                        .orElseThrow(() -> new IllegalArgumentException(""));
+
+
+        if (!isSectionLastElement(section)) {
+            throw new IllegalArgumentException("마지막 구간에 해당하는 역만 삭제할 수 있습니다.");
+        }
+
+        sections.remove(sections.size() - 1);
+    }
+
+    private boolean isSectionLastElement(Section section) {
+        Section lastSection = sections.get(sections.size() - 1);
+        return section.equals(lastSection);
     }
 
     public Long getId() {
