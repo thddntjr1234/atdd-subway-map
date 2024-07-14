@@ -22,7 +22,7 @@ public class LineService {
         Station upwardStation = stationService.findByStationId(request.getUpwardStationId());
         Station downwardStation = stationService.findByStationId(request.getDownwardStationId());
 
-        Line line = lineRepository.save(new Line(request.getName(), request.getColor(), upwardStation, downwardStation, request.getDistance()));
+        Line line = lineRepository.save(new Line(request.getName(), request.getColor(), new Section(upwardStation, downwardStation, request.getDistance())));
 
         return LineResponse.of(line);
     }
@@ -53,5 +53,18 @@ public class LineService {
     @Transactional
     public void deleteLine(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public SectionResponse addSection(Long lineId, SectionCreateRequest request) {
+        Line line = lineRepository.findById(lineId).orElseThrow(() -> new IllegalArgumentException("구간을 추가할 노선이 존재하지 않습니다."));
+        Station upwardStation = stationService.findByStationId(request.getUpStationId());
+        Station downwardStation = stationService.findByStationId(request.getDownStationId());
+
+        Section newSection = new Section(upwardStation, downwardStation, request.getDistance());
+        line.addSection(newSection);
+        lineRepository.save(line);
+
+        return SectionResponse.of(newSection);
     }
 }

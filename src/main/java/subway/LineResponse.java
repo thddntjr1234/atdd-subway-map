@@ -3,6 +3,8 @@ package subway;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LineResponse {
     private Long id;
@@ -17,8 +19,10 @@ public class LineResponse {
         this.id = line.getId();
         this.name = line.getName();
         this.color = line.getColor();
-        this.stations.add(new StationResponse(line.getUpwardStation()));
-        this.stations.add(new StationResponse(line.getDownwardStation()));
+        this.stations = line.getSections().stream()
+                .flatMap(section -> Stream.of(new StationResponse(section.getUpwardStation()), new StationResponse(section.getDownwardStation())))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public static LineResponse of(Line line) {
