@@ -50,4 +50,12 @@ public class LineCommonApi {
                 .then().log().all()
                 .extract();
     }
+
+    public static ExtractableResponse<Response> deleteSection(Long lineId, Long stationId) {
+        return RestAssured.given().log().all()
+                .queryParam("stationId", stationId)
+                .when().delete("/lines/" + lineId + "/sections")
+                .then().log().all()
+                .extract();
+    }
 }
