@@ -19,6 +19,7 @@ public class SectionAcceptanceTest {
     private StationResponse 계양역;
     private StationResponse 국제업무지구역;
     private StationResponse 송도달빛축제공원역;
+    private StationResponse 석남역; // 실패 케이스를 위한 역
     private LineResponse 인천1호선;
 
     @BeforeEach
@@ -26,6 +27,7 @@ public class SectionAcceptanceTest {
         계양역 = StationCommonApi.createStation("계양역").as(StationResponse.class);
         국제업무지구역 = StationCommonApi.createStation("국제업무지구역").as(StationResponse.class);
         송도달빛축제공원역 = StationCommonApi.createStation("송도달빛축제공원역").as(StationResponse.class);
+        석남역 = StationCommonApi.createStation("석남역").as(StationResponse.class);
         인천1호선 = LineCommonApi.createLine(new LineCreateRequest("인천1호선", "bg-blue-400", 계양역.getId(), 국제업무지구역.getId(), 10)).as(LineResponse.class);
     }
 
@@ -72,5 +74,75 @@ public class SectionAcceptanceTest {
         List<String> names = line.getStations().stream().map(StationResponse::getName).collect(Collectors.toList());
 
         assertThat(names).containsExactly("계양역", "국제업무지구역");
+    }
+
+    /**
+     * Given: 등록된 노선이 존재하고
+     * When: 관리자가 등록된 노선의 하행역이 아닌 역을 새로운 구간의 상행역으로 추가하면
+     * Then: 지하철 구간 등록에 실패한다.
+     */
+    @DisplayName("하행역 등록 조건을 위반하여 구간 등록에 실패한다.")
+    @Test
+    void createInvalidDownStationSection() {
+        //given
+        SectionCreateRequest request = new SectionCreateRequest(석남역.getId(), 송도달빛축제공원역.getId(), 3);
+
+        //when
+        var response = LineCommonApi.addSection(인천1호선.getId(), request);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given: 등록된 노선이 존재하고
+     * When: 관리자가 노선에 등록된 역을 새로운 구간의 하행역으로 추가하면
+     * Then: 지하철 구간 등록에 실패한다.
+     */
+    @DisplayName("중복역 등록 조건을 위반하여 구간 등록에 실패한다.")
+    @Test
+    void createDuplicatedStationSection() {
+        //given
+        SectionCreateRequest request = new SectionCreateRequest(국제업무지구역.getId(), 계양역.getId(), 3);
+
+        //when
+        var response = LineCommonApi.addSection(인천1호선.getId(), request);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given: 추가된 구간이 없는 노선이 등록되어 있고
+     * When: 해당 노선의 하행역을 제거하면
+     * Then: 지하철 구간 제거에 실패한다.
+     */
+    @DisplayName("지하철 구간 삭제 중 구간이 1개인 노선의 구간 삭제에 실패한다.")
+    @Test
+    void deleteMinimumSection() {
+        //given
+
+        //when
+        var response = LineCommonApi.deleteSection(인천1호선.getId(), 송도달빛축제공원역.getId());
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    /**
+     * Given: 추가된 구간이 있는 노선이 등록되어 있고
+     * When: 해당 노선에 등록되지 않은 역을 제거하면
+     * Then: 지하철 구간 제거에 실패한다.
+     */
+    @DisplayName("지하철 구간 삭제 중 등록되지 않은 구간을 제거에 실패한다.")
+    @Test
+    void deleteUnknownSection() {
+        //given
+
+        //when
+        var response = LineCommonApi.deleteSection(인천1호선.getId(), 석남역.getId());
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

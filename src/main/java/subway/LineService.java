@@ -71,6 +71,6 @@ public class LineService {
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId).orElseThrow(() -> new IllegalArgumentException("구간을 삭제할 노선이 존재하지 않습니다."));
-        line.deleteSection(stationId);
+        line.deleteSection(stationService.findByStationId(stationId));
     }
 }

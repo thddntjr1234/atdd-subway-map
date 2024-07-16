@@ -67,7 +67,9 @@ public class SectionTest {
     @DisplayName("구간이 1개인 경우 역을 삭제할 수 없다.")
     @Test
     void deleteFailure() {
-        assertThatThrownBy(() -> line.deleteSection(3L)).isInstanceOf(NoSuchElementException.class);
+        //given
+        Station deleteTarget = downStation;
+        assertThatThrownBy(() -> line.deleteSection(deleteTarget)).isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName("정상 구간을 제거한다.")
@@ -79,7 +81,7 @@ public class SectionTest {
         Section newSection = new Section(newUpStation, newDownStation, 3);
         line.addSection(newSection);
 
-        line.deleteSection(newDownStation.getId());
+        line.deleteSection(newDownStation);
         assertThat(line.getSections().get(0)).isEqualTo(new Section(upStation, downStation, 15));
     }
 }

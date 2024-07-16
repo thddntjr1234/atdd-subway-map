@@ -56,22 +56,22 @@ public class Line {
         return !stations.contains(downStation);
     }
 
-    public void deleteSection(Long stationId) {
+    public void deleteSection(Station station) {
         if (sections.size() == 1) {
             throw new NoSuchElementException("구간이 1개인 경우 구간을 삭제할 수 없습니다.");
         }
 
         Section section = sections.stream()
-                        .filter(element -> Objects.equals(element.getDownwardStation().getId(), stationId))
+                        .filter(element -> element.getDownwardStation().equals(station))
                                 .findFirst()
-                                        .orElseThrow(() -> new IllegalArgumentException(""));
+                                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 구간입니다."));
 
 
         if (!isSectionLastElement(section)) {
             throw new IllegalArgumentException("마지막 구간에 해당하는 역만 삭제할 수 있습니다.");
         }
 
-        sections.remove(sections.size() - 1);
+        sections.remove(section);
     }
 
     private boolean isSectionLastElement(Section section) {
